@@ -1,0 +1,33 @@
+---
+classes:
+  - sudo
+  - users
+  - sc_ini
+  - sc_hosts
+  - sc_supervisor
+  - vm_config
+  - supervisord
+
+supervisord::package_provider: pip
+# important: nodaemon has to be true on docker platform!
+supervisord::nodaemon: false
+# important: service_manage has to be false on docker platform!
+supervisord::service_manage: true
+
+
+
+users::users:
+  dummy-user:
+    uid: 1020
+    group: www-data
+    sshkeys:
+      - [FILL_IN_USER_PUBLIC_SSH_KEY]
+  vagrant:
+    uid: 1000
+
+
+sudo::configs:
+  dummy-user:
+    content:  'dummy-user ALL= NOPASSWD: ALL'
+  vagrant:
+    content: 'vagrant ALL= NOPASSWD: ALL'

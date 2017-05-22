@@ -1,0 +1,9 @@
+---
+classes:
+  - redis
+  - sc_redis
+  
+redis::manage_repo: true
+redis::bind: '%{::ipaddress_eth1}'
+redis::maxmemory: 6g
+redis::daemonize: false

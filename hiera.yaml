@@ -1,0 +1,18 @@
+---
+:backends:
+  - yaml
+:yaml:
+  :datadir: /opt/repos/clusterconfig
+:hierarchy:
+  - 'nodes/%{::clientcert}'
+  - 'roles/%{::role_10}'
+  - 'roles/%{::role_9}'
+  - 'roles/%{::role_8}'
+  - 'roles/%{::role_7}'
+  - 'roles/%{::role_6}'
+  - 'roles/%{::role_5}'
+  - 'roles/%{::role_4}'
+  - 'roles/%{::role_3}'
+  - 'roles/%{::role_2}'
+  - 'roles/%{::role_1}'
+  - common

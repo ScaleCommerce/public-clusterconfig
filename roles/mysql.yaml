@@ -1,0 +1,131 @@
+---
+mysql::server::root_password: snFcWumNFRJno6YDYYGydvBG
+
+###############################################################
+### Add your MySQL Databases here                             #
+#                                                             #
+###############################################################
+sc_mysql::databases:
+  shop_live:
+    user:     'shop_live'
+    password: 'nKTNeGuqy7jzGPcVxVFtjcJT'
+    host:     '10.1.1.%'
+    grant:    ['All']
+    charset:  'utf8'
+    collate:  'utf8_general_ci'
+
+
+###############################################################
+### Optional: add additional users and grants                 #
+#                                                             #
+###############################################################
+#mysql::server::users:
+#  '<USERNAME>@<HOST>':
+#    ensure: present
+#    password_hash: '<PASSWORD-HASH>'
+#mysql::server::grants:
+#  '<USERNAME>@<HOST>/<DATABASE>.*':
+#    ensure: present
+#    options: ['GRANT']
+#    privileges: ['SELECT', 'INSERT', 'UPDATE', 'DELETE']
+#    table: '<DATABASE>.*'
+#    user: <USERNAME>@<HOST>
+
+
+
+
+###############################################################
+### You don't need to edit anything below here                #
+###############################################################
+classes:
+  - sc_mysql
+  - apt
+  - logrotate
+
+
+apt::sources:
+  'percona':
+    location: 'http://repo.percona.com/apt'
+    release: '%{::lsbdistcodename}'
+    repos: 'main'
+    key:
+      id: '4D1BB29D63D98E422B2113B19334A25F8507EFA5'
+      server: 'keys.gnupg.net'
+
+packages::first:
+  'percona-server-server-5.7':
+    ensure: installed
+  'percona-server-client-5.7':
+    ensure: installed
+  'percona-toolkit':
+    ensure: installed
+  'percona-xtrabackup-24':
+    ensure: installed
+
+mysql::server::package_manage: false
+mysql::client::package_manage: false
+mysql::server::remove_default_accounts: true
+mysql::server::restart: true
+mysql::server::override_options:
+  mysqld:
+    'server_id': "%{mysql_server_id}"
+    'key_buffer_size': '100M'
+    'bind_address': '*'
+    'skip_name_resolve': 'ON'
+    'max_connections': '200'
+    'binlog_cache_size': '1M'
+    'max_heap_table_size': '128M'
+    'read_buffer_size': '244K'
+    'sort_buffer_size': '2047K'
+    'join_buffer_size': '244K'
+    'query_cache_type': 'ON'
+    'query_cache_size': '64M'
+    'tmp_table_size': '128M'
+    'log-bin': 'mysql-bin'
+    'expire_logs_days': '1'
+    'binlog_format': 'mixed'
+    'userstat': 'ON'
+    'slow_query_log': 'ON'
+    'long_query_time': '1'
+    'slow_query_log_file': '/var/log/mysql/mysqld.slowlog'
+    'relay_log': 'mysqld-relay-bin'
+    'max_relay_log_size': '256M'
+    'bulk_insert_buffer_size': '64M'
+    'myisam_sort_buffer_size': '64M'
+    'innodb_flush_log_at_trx_commit': '2'
+    'innodb_log_file_size': '256M'
+    'innodb_buffer_pool_load_at_startup': 'ON'
+    'innodb_buffer_pool_dump_at_shutdown': 'ON'
+    'innodb_buffer_pool_size': '1G'
+    'innodb_read_io_threads': '4'
+    'innodb_write_io_threads': '4'
+    'innodb_io_capacity': '1000'
+    'innodb_doublewrite': 'OFF'
+    ####### the following line is needed only in MySQL 5,7 ###############
+    'innodb_temp_data_file_path': 'ibtmp1:12M:autoextend:max:5G'
+    ######################################################################
+    'max_slowlog_size': '4G'
+    'max_slowlog_files': '1'
+    'log_slow_verbosity': 'full'
+    ##### the following 2 settings have to be removed for MySQL 5.7 ######
+    #'slow_query_log_timestamp_precision': 'microsecond'
+    #'slow_query_log_timestamp_always': 'ON'
+    ######################################################################
+    'collation-server': 'utf8_general_ci'
+    'character-set-server': 'utf8'
+
+logrotate::rules:
+  mysql:
+    path: '/var/log/mysql/*log'
+    rotate: 14
+    rotate_every: 'day'
+    compress: true
+    missingok: true
+    delaycompress: false
+    ifempty: false
+    create: true
+    create_owner: 'mysql'
+    create_group: 'mysql'
+    create_mode: '640'
+
+
